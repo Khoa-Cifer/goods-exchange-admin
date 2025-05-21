@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Save, BarChart, PieChart, Users, Calendar } from 'lucide-react';
+import { Save, BarChart, PieChart, Users, Calendar, AlertTriangle, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const PlatformSettings = () => {

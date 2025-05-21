@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Users, ShoppingBag, AlertTriangle, Settings } from 'lucide-react';
+import { Users, ShoppingBag, AlertTriangle, Settings, BarChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onPageChange, currentPage }) => {
     { id: 'users', label: 'Users', icon: <Users className="sidebar-icon" /> },
     { id: 'listings', label: 'Listings', icon: <ShoppingBag className="sidebar-icon" /> },
     { id: 'disputes', label: 'Disputes', icon: <AlertTriangle className="sidebar-icon" /> },
+    { id: 'charts', label: 'Charts', icon: <BarChart className="sidebar-icon" /> },
     { id: 'settings', label: 'Settings', icon: <Settings className="sidebar-icon" /> },
   ];
 
@@ -66,3 +67,4 @@ const Sidebar: React.FC<SidebarProps> = ({ onPageChange, currentPage }) => {
 };
 
 export default Sidebar;
+
