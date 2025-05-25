@@ -55,14 +55,14 @@ const ChartsStatistics = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Charts & Statistics</h1>
-      
       <Tabs defaultValue="user-growth" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 text-blue-500">
           <TabsTrigger value="user-growth">User Growth</TabsTrigger>
           <TabsTrigger value="listing-categories">Listing Categories</TabsTrigger>
           <TabsTrigger value="dispute-resolution">Dispute Resolution</TabsTrigger>
         </TabsList>
         
+        {/* user Growth */}
         <TabsContent value="user-growth">
           <Card>
             <CardHeader>
@@ -74,7 +74,7 @@ const ChartsStatistics = () => {
             <CardContent className="h-80">
               <ChartContainer config={chartConfig}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={userGrowthData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart data={userGrowthData} margin={{ top: 0, right: 20, left: 20, bottom: 450 }}>
                     <defs>
                       <linearGradient id="userGrowth" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#3498db" stopOpacity={0.8} />
@@ -94,7 +94,8 @@ const ChartsStatistics = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
+        {/* listing Categories */}
         <TabsContent value="listing-categories">
           <Card>
             <CardHeader>
@@ -106,7 +107,7 @@ const ChartsStatistics = () => {
             <CardContent className="h-80">
               <ChartContainer config={chartConfig}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <PieChart margin={{ top: 0, right: 30, left: 20, bottom: 450 }}>
                     <Tooltip content={<ChartTooltipContent />} />
                     <Legend />
                     <Pie 
@@ -125,7 +126,8 @@ const ChartsStatistics = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
+        {/* dispute Resolution */}
         <TabsContent value="dispute-resolution">
           <Card>
             <CardHeader>
@@ -137,7 +139,7 @@ const ChartsStatistics = () => {
             <CardContent className="h-80">
               <ChartContainer config={chartConfig}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={disputesTimelineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <BarChart data={disputesTimelineData} margin={{ top: 0, right: 30, left: 20, bottom: 450 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff11" vertical={false} />
                     <XAxis dataKey="week" />
                     <YAxis />
@@ -152,8 +154,10 @@ const ChartsStatistics = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
+      {/* mấy cái ô vuông */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+
         <Card className="bg-dark-100">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Total Users</CardTitle>
