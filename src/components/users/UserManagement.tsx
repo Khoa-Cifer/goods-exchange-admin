@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Plus, Edit, Ban, Trash2 } from 'lucide-react';
 import { mockUsers } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import http from '@/axios/http';
 
 interface User {
   id: string;
@@ -22,15 +23,15 @@ const UserManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const { toast } = useToast();
-  
+
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    
+
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -43,15 +44,25 @@ const UserManagement = () => {
     setShowEditModal(true);
   };
 
+  const getAllUsers = async () => {
+    const response = await http.get("/users/all-users");
+    const data = await response.data;
+    console.log(data);
+  }
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
   const handleSuspendUser = (userId: string) => {
-    const updatedUsers = users.map(user => 
+    const updatedUsers = users.map(user =>
       user.id === userId ? { ...user, status: user.status === 'active' ? 'suspended' : 'active' } : user
     );
     setUsers(updatedUsers);
-    
+
     const user = users.find(u => u.id === userId);
     const newStatus = user?.status === 'active' ? 'suspended' : 'active';
-    
+
     toast({
       title: `User ${newStatus}`,
       description: `${user?.username} has been ${newStatus}`,
@@ -61,11 +72,11 @@ const UserManagement = () => {
 
   const handleDeleteUser = (userId: string) => {
     const userToDelete = users.find(user => user.id === userId);
-    
+
     if (confirm(`Are you sure you want to delete ${userToDelete?.username}?`)) {
       const updatedUsers = users.filter(user => user.id !== userId);
       setUsers(updatedUsers);
-      
+
       toast({
         title: "User deleted",
         description: `${userToDelete?.username} has been deleted from the system`,
@@ -79,7 +90,7 @@ const UserManagement = () => {
     const form = e.target as HTMLFormElement;
     const username = (form.elements.namedItem('username') as HTMLInputElement).value;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-    
+
     const newUser = {
       id: `user-${Date.now()}`,
       username,
@@ -87,10 +98,10 @@ const UserManagement = () => {
       role: 'moderator',
       status: 'active'
     };
-    
+
     setUsers([...users, newUser]);
     setShowAddModal(false);
-    
+
     toast({
       title: "Moderator added",
       description: `${username} has been added as a moderator`,
@@ -100,19 +111,19 @@ const UserManagement = () => {
   const updateUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
-    
+
     const form = e.target as HTMLFormElement;
     const username = (form.elements.namedItem('username') as HTMLInputElement).value;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const role = (form.elements.namedItem('role') as HTMLSelectElement).value;
-    
-    const updatedUsers = users.map(user => 
+
+    const updatedUsers = users.map(user =>
       user.id === currentUser.id ? { ...user, username, email, role } : user
     );
-    
+
     setUsers(updatedUsers);
     setShowEditModal(false);
-    
+
     toast({
       title: "User updated",
       description: `${username}'s account has been updated`,
@@ -123,7 +134,7 @@ const UserManagement = () => {
     <div className="container mx-auto p-6">
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <h1 className="text-2xl font-bold mb-4 md:mb-0">User Management</h1>
-        
+
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -135,8 +146,8 @@ const UserManagement = () => {
               className="pl-10 pr-4 py-2 bg-dark-100 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full md:w-60"
             />
           </div>
-          
-          <select 
+
+          <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="px-4 py-2 bg-dark-100 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -146,8 +157,8 @@ const UserManagement = () => {
             <option value="seller">Sellers</option>
             <option value="moderator">Moderators</option>
           </select>
-          
-          <select 
+
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 bg-dark-100 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -156,8 +167,8 @@ const UserManagement = () => {
             <option value="active">Active</option>
             <option value="suspended">Suspended</option>
           </select>
-          
-          <button 
+
+          <button
             onClick={handleAddModerator}
             className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition-colors"
           >
@@ -166,7 +177,7 @@ const UserManagement = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="bg-dark-100 rounded-lg shadow-md overflow-hidden overflow-x-auto">
         <table className="min-w-full divide-y divide-dark-200">
           <thead className="bg-dark-200">
@@ -232,7 +243,7 @@ const UserManagement = () => {
           </tbody>
         </table>
       </div>
-      
+
       {/* Add Moderator Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -241,31 +252,31 @@ const UserManagement = () => {
             <form onSubmit={saveNewModerator}>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Username</label>
-                <input 
-                  type="text" 
-                  name="username" 
-                  required 
+                <input
+                  type="text"
+                  name="username"
+                  required
                   className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Email</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  required 
+                <input
+                  type="email"
+                  name="email"
+                  required
                   className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="flex justify-end space-x-2">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 text-gray-300 hover:text-white"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80"
                 >
@@ -276,7 +287,7 @@ const UserManagement = () => {
           </div>
         </div>
       )}
-      
+
       {/* Edit User Modal */}
       {showEditModal && currentUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -285,28 +296,28 @@ const UserManagement = () => {
             <form onSubmit={updateUser}>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Username</label>
-                <input 
-                  type="text" 
-                  name="username" 
+                <input
+                  type="text"
+                  name="username"
                   defaultValue={currentUser.username}
-                  required 
+                  required
                   className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Email</label>
-                <input 
-                  type="email" 
-                  name="email" 
+                <input
+                  type="email"
+                  name="email"
                   defaultValue={currentUser.email}
-                  required 
+                  required
                   className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Role</label>
-                <select 
-                  name="role" 
+                <select
+                  name="role"
                   defaultValue={currentUser.role}
                   className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 >
@@ -316,14 +327,14 @@ const UserManagement = () => {
                 </select>
               </div>
               <div className="flex justify-end space-x-2">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowEditModal(false)}
                   className="px-4 py-2 text-gray-300 hover:text-white"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80"
                 >
