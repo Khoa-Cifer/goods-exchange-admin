@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -18,7 +16,9 @@ const Login = () => {
     console.log("Response from Google:", response);
     const loginResponse = await login(response);
     console.log("Response from server:", loginResponse);
-    navigate("/dashboard");
+    if (loginResponse.accessToken) {
+      navigate("/dashboard")
+    }
   };
 
   return (
@@ -30,9 +30,9 @@ const Login = () => {
             Sign in to access the admin dashboard
           </CardDescription>
         </CardHeader>
-         <div className="flex flex-col gap-3">
-            <GoogleLogin text="continue_with" onSuccess={handleLogin} />
-          </div>
+        <div className="flex flex-col gap-3">
+          <GoogleLogin text="continue_with" onSuccess={handleLogin} />
+        </div>
       </Card>
     </div>
   );
