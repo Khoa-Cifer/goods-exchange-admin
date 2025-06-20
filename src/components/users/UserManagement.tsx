@@ -9,7 +9,7 @@ interface User {
   id: string;
   username: string;
   email: string;
-  role: string;
+  role: string[];
   status: string;
 }
 
@@ -119,13 +119,19 @@ const UserManagement = () => {
     const username = (form.elements.namedItem("username") as HTMLInputElement)
       .value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const role = (form.elements.namedItem("role") as HTMLSelectElement).value;
+
+    // Get multiple checked roles
+    const roleElements = form.querySelectorAll('input[name="roles"]:checked');
+    const roles = Array.from(roleElements).map(
+      (el) => (el as HTMLInputElement).value
+    );
+
     const status = (form.elements.namedItem("status") as HTMLSelectElement)
       .value;
 
     const updatedUsers = users.map((user) =>
       user.id === currentUser.id
-        ? { ...user, username, email, role, status }
+        ? { ...user, username, email, roles, status }
         : user
     );
 
@@ -219,7 +225,9 @@ const UserManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap capitalize">
-                    {user.role}
+                    {Array.isArray(user.role)
+                      ? user.role.join(", ")
+                      : user.role}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -336,7 +344,8 @@ const UserManagement = () => {
                   name="username"
                   defaultValue={currentUser.username}
                   required
-                  className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled
+                  className="w-full px-4 py-2 bg-dark-300 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="mb-4">
@@ -346,21 +355,32 @@ const UserManagement = () => {
                   name="email"
                   defaultValue={currentUser.email}
                   required
-                  className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled
+                  className="w-full px-4 py-2 bg-dark-300 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Role</label>
-                <select
-                  name="role"
-                  defaultValue={currentUser.role}
-                  className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="buyer">Buyer</option>
-                  <option value="seller">Seller</option>
-                  <option value="moderator">Moderator</option>
-                </select>
+                <label className="block text-sm font-medium mb-2">Roles</label>
+                <div className="w-full px-4 py-2 bg-dark-200 border border-dark-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary h-32">
+                  <div className="space-y-3 mt-3">
+                    {["buyer", "seller", "moderator"].map((role) => (
+                      <label key={role} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          name="roles"
+                          value={role}
+                          defaultChecked={currentUser.role.includes(role)}
+                          className="form-checkbox text-primary"
+                        />
+                        <span className="text-sm">
+                          {role.charAt(0).toUpperCase() + role.slice(1)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
+
               <div className="mb-5">
                 <label className="block text-sm font-medium mb-2">Status</label>
                 <select
