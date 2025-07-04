@@ -1,10 +1,10 @@
-import http from '@/axios/http';
+import http from '@/utils/http';
 import React, { createContext, useContext, useState } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (googleResponse: any) => Promise<any>;
-  logout: (googleResponse: any) => void;
+  logout: () => void;
   csrfToken: string | null;
   sessionId: string | null;
   accessToken: string | null;
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const data = await response.data;
     const { accessToken, sessionId, csrfToken } = data.authResult.cookies;
-   
+
     // Only store sessionId/csrfToken (accessToken is assumed in HTTP-only cookie)
     localStorage.setItem('csrfToken', csrfToken);
     localStorage.setItem('sessionId', sessionId);
@@ -43,15 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await fetch('http://localhost:3000/api/logout', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrfTokenState || '',
-      },
-    });
-
     localStorage.removeItem('csrfToken');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('sessionId');

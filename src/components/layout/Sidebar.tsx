@@ -1,14 +1,18 @@
 
 import React, { useState } from 'react';
-import { Users, ShoppingBag, AlertTriangle, Settings, BarChart } from 'lucide-react';
+import { Users, ShoppingBag, AlertTriangle, Settings, BarChart, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { getCurrentUser } from '@/utils/utils';
+import { Button } from '../ui/button';
+import { useAuth } from '@/context/auth-context';
 
 const Sidebar: React.FC = () => {
+  const { logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const currentUser = getCurrentUser(localStorage.getItem('accessToken') || '');
   const menuItems = [
     { id: '/dashboard', label: 'Dashboard', icon: <BarChart className="sidebar-icon" /> },
     { id: '/users', label: 'Users', icon: <Users className="sidebar-icon" /> },
@@ -22,23 +26,28 @@ const Sidebar: React.FC = () => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  }
+
   return (
     <div className={cn(
-      "bg-dark-100 transition-all duration-300 flex flex-col", 
+      "bg-dark-100 transition-all duration-300 flex flex-col",
       collapsed ? "w-16" : "w-64"
     )}>
       <div className="p-4 border-b border-dark-200 flex items-center justify-between">
         {!collapsed && (
           <div className="text-white font-bold text-xl">GoodEx Admin</div>
         )}
-        <button 
+        <button
           onClick={() => setCollapsed(!collapsed)}
           className="text-white p-1 hover:bg-dark-200 rounded-md ml-auto"
         >
           {collapsed ? "→" : "←"}
         </button>
       </div>
-      
+
       <nav className="flex-1 p-2">
         {menuItems.map((item) => (
           <button
@@ -46,8 +55,8 @@ const Sidebar: React.FC = () => {
             onClick={() => handlePageChange(item.id)}
             className={cn(
               "w-full flex items-center p-3 mb-2 rounded-md transition-colors duration-200",
-              location.pathname === item.id 
-                ? "bg-primary text-white" 
+              location.pathname === item.id
+                ? "bg-primary text-white"
                 : "text-gray-300 hover:bg-dark-200"
             )}
           >
@@ -58,10 +67,17 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className="p-4 border-t border-dark-200">
-        {!collapsed && (
-          <div className="text-sm text-gray-400">
-            <div className="font-semibold">Admin User</div>
-            <div>admin@goodex.com</div>
+        {!collapsed && currentUser && (
+          <div className='flex justify-between'>
+            <div className="text-sm text-gray-400">
+              <div className="font-semibold">{currentUser.name}</div>
+              <div>{currentUser.email}</div>
+            </div>
+            <div>
+              <button onClick={handleLogout}>
+                <LogOut />
+              </button>
+            </div>
           </div>
         )}
       </div>

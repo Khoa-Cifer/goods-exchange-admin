@@ -5,6 +5,6 @@ export type User = {
   username: string;
   email: string;
   userRoles: Role[];
-  is_active: number;
+  isActive: number;
   provider: string;
 }

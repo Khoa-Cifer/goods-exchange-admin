@@ -1,6 +1,7 @@
 export type UserTokenData = {
   sub: string;
   name: string;
+  email: string;
   googleId: string;
   roleId: string;
   iss: string;
